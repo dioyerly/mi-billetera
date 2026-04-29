@@ -1,0 +1,136 @@
+:root {
+    --bg: #F8F9FA;
+    --card-grad: linear-gradient(135deg, #CFBAF0, #A3C4F3);
+    --pastel-green: #B9FBC0;
+    --pastel-red: #FFCFD2;
+    --pastel-purple: #D0D1FF;
+    --text: #4A4A4A;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+
+body { background-color: var(--bg); color: var(--text); display: flex; justify-content: center; }
+
+.app-container { width: 100%; max-width: 480px; padding: 20px; }
+
+/* Tarjeta Principal */
+.balance-card {
+    background: var(--card-grad);
+    color: white;
+    padding: 25px;
+    border-radius: 25px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(163, 196, 243, 0.4);
+    margin-bottom: 25px;
+    cursor: pointer;
+}
+.balance-card p { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+.balance-card h1 { font-size: 2.8rem; margin: 5px 0; }
+.balance-card small { font-size: 0.7rem; opacity: 0.8; }
+
+/* Botones Principales */
+.controls { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+.btn { border: none; padding: 16px; border-radius: 18px; font-size: 1rem; font-weight: bold; cursor: pointer; color: #444; }
+.btn-ingreso { background-color: var(--pastel-green); }
+.btn-gasto { background-color: var(--pastel-red); }
+
+/* Accesos Rápidos */
+.quick-tags h3 { font-size: 0.9rem; color: #888; margin-bottom: 10px; }
+.tags-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; }
+.tags-container button { 
+    background-color: white; border: 1px solid #E0E0E0; padding: 8px 14px; 
+    border-radius: 20px; font-size: 0.8rem; cursor: pointer; color: #666;
+}
+
+/* Lista */
+.lista-movimientos h3 { font-size: 0.9rem; color: #888; margin-bottom: 10px; }
+.item { 
+    background: white; padding: 15px; border-radius: 15px; 
+    display: flex; justify-content: space-between; align-items: center; 
+    margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+}
+.item.gasto { border-left: 5px solid var(--pastel-red); }
+.item.ingreso { border-left: 5px solid var(--pastel-green); }
+
+/* Modales */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 10; }
+.hidden { display: none; }
+.modal-content { background: white; padding: 25px; border-radius: 25px; width: 85%; max-width: 350px; }
+.modal-content input { width: 100%; padding: 15px; margin: 15px 0; border: 1px solid #EEE; border-radius: 12px; font-size: 1rem; outline: none; }
+.modal-actions { display: flex; gap: 10px; }
+.modal-actions button { flex: 1; padding: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; }
+.btn-cancel { background: #F0F0F0; }
+.btn-confirm { background: var(--pastel-purple); }
+
+/* Grilla de Gastos */
+.grid-gastos {
+    margin-top: 20px;
+}
+
+.grid-gastos h3 {
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 15px;
+}
+
+.contenedor-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas */
+    gap: 12px;
+    padding-bottom: 30px;
+}
+
+.card-gasto {
+    background: white;
+    padding: 15px;
+    border-radius: 20px;
+    border: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.1s;
+    cursor: pointer;
+}
+
+.card-gasto:active {
+    transform: scale(0.95);
+    background-color: #f9f9f9;
+}
+
+.card-gasto .icon { font-size: 1.6rem; margin-bottom: 5px; }
+.card-gasto .name { font-size: 0.8rem; font-weight: bold; color: #777; text-transform: uppercase; }
+.card-gasto .amount { font-size: 1rem; font-weight: bold; color: #4A4A4A; margin: 4px 0; }
+.card-gasto .date { font-size: 0.65rem; color: #ff8fab; font-weight: bold; }
+
+/* Ajuste para el campo fecha dentro del modal */
+#campo-fecha {
+    margin-top: 10px;
+    text-align: left;
+}
+
+#fecha-vencimiento {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    margin-top: 5px;
+}
+
+.month-selector { margin-bottom: 15px; display: flex; justify-content: center; }
+.month-selector input { 
+    padding: 10px; border-radius: 15px; border: 1px solid #ddd; 
+    font-size: 1rem; color: #666; background: white;
+}
+
+.card-gasto.pagado { background-color: #d1f7d6; border-color: #a8e6b0; }
+.card-gasto.pagado .amount { color: #2d6a4f; text-decoration: line-through; opacity: 0.6; }
+.card-gasto.pagado .date { color: #2d6a4f; }
+
+.btn-pagado {
+    width: 100%; padding: 15px; border: none; border-radius: 12px;
+    background-color: #B9FBC0; color: #2d6a4f; font-weight: bold;
+    margin-bottom: 10px; cursor: pointer;
+}
+
+.modal-actions-column { display: flex; flex-direction: column; margin-top: 15px; }

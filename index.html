@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mi Billetera Pastel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="balance-card">
+            <p>Dinero Disponible</p>
+            <h1 id="saldo-total">$0.00</h1>
+            <small id="ingreso-inicial-texto">Ingreso Inicial: $0.00</small>
+        </header>
+
+        <section class="month-selector">
+            <input type="month" id="mes-activo" onchange="cambiarMes()">
+        </section>
+
+        <section class="controls">
+            <button onclick="abrirModalSaldo()" class="btn btn-ingreso" style="grid-column: span 2;">＋ Agregar Entrada de Dinero</button>
+        </section>
+
+        <section class="grid-gastos">
+            <h3>Estado de Gastos</h3>
+            <div class="contenedor-cards" id="contenedor-cards">
+                </div>
+        </section>
+    </div>
+
+    <div id="modal-gasto-especifico" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="titulo-gasto-fijo">Editar</h2>
+            <input type="number" id="monto-fijo" inputmode="decimal" placeholder="Monto $">
+            
+            <div id="campo-fecha" class="hidden">
+                <label style="font-size: 0.8rem; color: #888;">Fecha de Vencimiento:</label>
+                <input type="date" id="fecha-vencimiento">
+            </div>
+
+            <div class="modal-actions-column">
+                <button id="btn-pagado" onclick="marcarComoPagado()" class="btn-pagado">MARCAR COMO PAGADO</button>
+                <div class="modal-actions">
+                    <button type="button" onclick="cerrarModalGasto()" class="btn-cancel">Cancelar</button>
+                    <button type="button" onclick="guardarGastoFijo()" class="btn-confirm">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-saldo" class="modal hidden">
+    <div class="modal-content">
+        <h2>Ajustar Dinero</h2>
+        <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">
+            Pon el monto a sumar. <br> 
+            <b>Usa el signo menos (-) para restar</b> (Ej: -500).
+        </p>
+        <input type="number" id="nuevo-saldo-input" inputmode="decimal" placeholder="Ej: 5000 o -500">
+        <div class="modal-actions">
+            <button type="button" onclick="cerrarModalSaldo()" class="btn-cancel">Cancelar</button>
+            <button type="button" onclick="guardarSaldoInicial()" class="btn-confirm">Aplicar</button>
+        </div>
+    </div>
+</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
