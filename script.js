@@ -13,7 +13,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // --- VARIABLES DE LA APP ---
-let datosMensuales = {}; // Se cargará desde Firebase
+let datosMensuales = {}; 
 let mesActual = ""; 
 
 const categoriasBase = [
@@ -39,13 +39,14 @@ window.onload = () => {
     mesActual = hoy.toISOString().substring(0, 7); 
     document.getElementById('mes-activo').value = mesActual;
 
-    // ESCUCHAR CAMBIOS EN TIEMPO REAL (Firebase sustituye a localStorage)
     db.collection("usuarios").doc("mi_unica_cuenta").onSnapshot((doc) => {
         if (doc.exists) {
             datosMensuales = doc.data();
         }
         inicializarMes(mesActual);
         actualizarUI();
+    }, (error) => {
+        console.log("Error cargando datos:", error);
     });
 };
 
@@ -59,9 +60,12 @@ function inicializarMes(mes) {
     }
 }
 
-// NUEVA FUNCIÓN: Sincroniza con Firebase
 async function guardarEnNube() {
-    await db.collection("usuarios").doc("mi_unica_cuenta").set(datosMensuales);
+    try {
+        await db.collection("usuarios").doc("mi_unica_cuenta").set(datosMensuales);
+    } catch (e) {
+        console.error("Error al guardar:", e);
+    }
 }
 
 function cambiarMes() {
@@ -97,7 +101,8 @@ function actualizarUI() {
     let saldoDispo = data.ingreso - (totalPendienteEsteMes + totalDeudaPasada);
 
     document.getElementById('saldo-total').innerText = `$${saldoDispo.toLocaleString('es-AR')}`;
-    document.getElementById('ingreso-inicial-texto').innerText = `Ingreso Inicial: $${data.ingreso.toLocaleString('es-AR')}`;
+    const inicialTxt = document.getElementById('ingreso-inicial-texto');
+    if(inicialTxt) inicialTxt.innerText = `Ingreso Inicial: $${data.ingreso.toLocaleString('es-AR')}`;
     
     renderizarCards();
 }
@@ -126,7 +131,7 @@ function renderizarCards() {
             <span class="name">${cat.nombre}</span>
             <span class="amount">$${montoMostrar.toLocaleString('es-AR')}</span>
             <div class="date">
-                ${cat.pagado ? '✅ PAGADO ESTE MES' : (cat.fecha ? 'Vence: ' + cat.fecha : '')}
+                ${cat.pagado ? '✅ PAGADO' : (cat.fecha ? 'Vence: ' + cat.fecha : '')}
                 ${deudaVieja > 0 && !cat.pagado ? `<br><small style="color:#d63384; font-weight:bold;">Deuda anterior: $${deudaVieja.toLocaleString('es-AR')}</small>` : ''}
             </div>
         `;
@@ -162,14 +167,14 @@ function guardarGastoFijo() {
     cat.monto = monto;
     cat.fecha = fecha;
     cerrarModalGasto();
-    guardarEnNube(); // <--- Sincroniza
+    guardarEnNube();
 }
 
 function marcarComoPagado() {
     const cat = datosMensuales[mesActual].gastos.find(g => g.id === catSeleccionadaId);
     cat.pagado = !cat.pagado;
     cerrarModalGasto();
-    guardarEnNube(); // <--- Sincroniza
+    guardarEnNube();
 }
 
 function abrirModalSaldo() { 
@@ -183,7 +188,7 @@ function guardarSaldoInicial() {
     const valorIngresado = parseFloat(input.value) || 0;
     datosMensuales[mesActual].ingreso += valorIngresado;
     cerrarModalSaldo();
-    guardarEnNube(); // <--- Sincroniza
+    guardarEnNube();
 }
 
 function cerrarModalGasto() { document.getElementById('modal-gasto-especifico').classList.add('hidden'); }
