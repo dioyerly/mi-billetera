@@ -21,11 +21,12 @@ const categoriasBase = [
     { id: 'EXPENSAS', nombre: 'Expensas', icono: '🏢', tieneVencimiento: true },
     { id: 'AYSA', nombre: 'AySA', icono: '💧', tieneVencimiento: true },
     { id: 'EDESUR', nombre: 'Edesur', icono: '⚡', tieneVencimiento: true },
+    { id: 'METROGAS', nombre: 'Metrogas', icono: '🔥', tieneVencimiento: true }, // <--- LA NUEVA TARJETA
     { id: 'ABL', nombre: 'ABL', icono: '📜', tieneVencimiento: true },
     { id: 'TARJETA', nombre: 'Tarjeta', icono: '💳', tieneVencimiento: true },
     { id: 'GOCUOTAS', nombre: 'GoCuotas', icono: '🛍️' },
     { id: 'PRESTAMOS', nombre: 'Préstamos', icono: '💰' },
-    { id: 'GRACIELA', nombre: 'Graciela', icono: '👤' },
+    { id: 'DEUDA', nombre: 'Deuda', icono: '👤' },
     { id: 'INTERNET', nombre: 'Internet', icono: '🌐' },
     { id: 'TELEFONO', nombre: 'Teléfono', icono: '📱' },
     { id: 'TRANSPORTE', nombre: 'Transporte', icono: '🚌' },
@@ -130,6 +131,7 @@ function renderizarCards() {
             <span class="icon">${cat.icono}</span>
             <span class="name">${cat.nombre}</span>
             <span class="amount">$${montoMostrar.toLocaleString('es-AR')}</span>
+            ${cat.nota ? `<div style="font-size:0.7rem; color:#888; font-style:italic;">"${cat.nota}"</div>` : ''}
             <div class="date">
                 ${cat.pagado ? '✅ PAGADO' : (cat.fecha ? 'Vence: ' + cat.fecha : '')}
                 ${deudaVieja > 0 && !cat.pagado ? `<br><small style="color:#d63384; font-weight:bold;">Deuda anterior: $${deudaVieja.toLocaleString('es-AR')}</small>` : ''}
@@ -144,9 +146,17 @@ let catSeleccionadaId = null;
 function abrirModalGasto(id) {
     catSeleccionadaId = id;
     const cat = datosMensuales[mesActual].gastos.find(g => g.id === id);
+    
     document.getElementById('titulo-gasto-fijo').innerText = cat.nombre;
     document.getElementById('monto-fijo').value = cat.monto || '';
     
+    // Si es EXTRAS, mostramos un prompt o habilitamos un campo de texto (usaremos el campo nota)
+    if (id === 'EXTRAS') {
+        const notaActual = cat.nota || "";
+        const nuevaNota = prompt("¿En qué gastaste este extra?", notaActual);
+        if (nuevaNota !== null) cat.nota = nuevaNota;
+    }
+
     const btnPagado = document.getElementById('btn-pagado');
     btnPagado.innerText = cat.pagado ? "DESMARCAR PAGO" : "MARCAR COMO PAGADO";
 
