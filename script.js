@@ -8,11 +8,9 @@ const firebaseConfig = {
   appId: "1:971416630264:web:748715dcfae0195a615c0d"
 };
 
-// Inicializamos Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// --- VARIABLES DE LA APP ---
 let datosMensuales = {}; 
 let mesActual = ""; 
 
@@ -21,7 +19,7 @@ const categoriasBase = [
     { id: 'EXPENSAS', nombre: 'Expensas', icono: '🏢', tieneVencimiento: true },
     { id: 'AYSA', nombre: 'AySA', icono: '💧', tieneVencimiento: true },
     { id: 'EDESUR', nombre: 'Edesur', icono: '⚡', tieneVencimiento: true },
-    { id: 'METROGAS', nombre: 'Metrogas', icono: '🔥', tieneVencimiento: true }, // <--- LA NUEVA TARJETA
+    { id: 'METROGAS', nombre: 'Metrogas', icono: '🔥', tieneVencimiento: true },
     { id: 'ABL', nombre: 'ABL', icono: '📜', tieneVencimiento: true },
     { id: 'TARJETA', nombre: 'Tarjeta', icono: '💳', tieneVencimiento: true },
     { id: 'GOCUOTAS', nombre: 'GoCuotas', icono: '🛍️' },
@@ -46,8 +44,6 @@ window.onload = () => {
         }
         inicializarMes(mesActual);
         actualizarUI();
-    }, (error) => {
-        console.log("Error cargando datos:", error);
     });
 };
 
@@ -55,7 +51,7 @@ function inicializarMes(mes) {
     if (!datosMensuales[mes]) {
         datosMensuales[mes] = {
             ingreso: 0,
-            gastos: categoriasBase.map(c => ({ ...c, monto: 0, fecha: '', pagado: false }))
+            gastos: categoriasBase.map(c => ({ ...c, monto: 0, fecha: '', pagado: false, nota: '' }))
         };
         guardarEnNube();
     }
@@ -131,7 +127,7 @@ function renderizarCards() {
             <span class="icon">${cat.icono}</span>
             <span class="name">${cat.nombre}</span>
             <span class="amount">$${montoMostrar.toLocaleString('es-AR')}</span>
-            ${cat.nota ? `<div style="font-size:0.7rem; color:#888; font-style:italic;">"${cat.nota}"</div>` : ''}
+            ${cat.nota ? `<div style="font-size:0.75rem; color:#d63384; font-weight:bold; margin-top:2px;">"${cat.nota}"</div>` : ''}
             <div class="date">
                 ${cat.pagado ? '✅ PAGADO' : (cat.fecha ? 'Vence: ' + cat.fecha : '')}
                 ${deudaVieja > 0 && !cat.pagado ? `<br><small style="color:#d63384; font-weight:bold;">Deuda anterior: $${deudaVieja.toLocaleString('es-AR')}</small>` : ''}
@@ -150,11 +146,13 @@ function abrirModalGasto(id) {
     document.getElementById('titulo-gasto-fijo').innerText = cat.nombre;
     document.getElementById('monto-fijo').value = cat.monto || '';
     
-    // Si es EXTRAS, mostramos un prompt o habilitamos un campo de texto (usaremos el campo nota)
     if (id === 'EXTRAS') {
         const notaActual = cat.nota || "";
         const nuevaNota = prompt("¿En qué gastaste este extra?", notaActual);
-        if (nuevaNota !== null) cat.nota = nuevaNota;
+        if (nuevaNota !== null) {
+            cat.nota = nuevaNota;
+            actualizarUI();
+        }
     }
 
     const btnPagado = document.getElementById('btn-pagado');
@@ -177,6 +175,7 @@ function guardarGastoFijo() {
     cat.monto = monto;
     cat.fecha = fecha;
     cerrarModalGasto();
+    actualizarUI();
     guardarEnNube();
 }
 
@@ -184,6 +183,7 @@ function marcarComoPagado() {
     const cat = datosMensuales[mesActual].gastos.find(g => g.id === catSeleccionadaId);
     cat.pagado = !cat.pagado;
     cerrarModalGasto();
+    actualizarUI();
     guardarEnNube();
 }
 
@@ -198,6 +198,7 @@ function guardarSaldoInicial() {
     const valorIngresado = parseFloat(input.value) || 0;
     datosMensuales[mesActual].ingreso += valorIngresado;
     cerrarModalSaldo();
+    actualizarUI();
     guardarEnNube();
 }
 
