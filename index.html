@@ -11,7 +11,7 @@
         <header class="balance-card">
             <p>DINERO DISPONIBLE</p>
             <h1 id="saldo-total">$0,00</h1>
-            <small id="ingreso-inicial-texto">Ingreso Inicial: $0,00</small>
+            <small id="ingreso-inicial-texto">Cargando...</small>
         </header>
 
         <section class="month-selector">
@@ -19,7 +19,7 @@
         </section>
 
         <section class="controls">
-            <button onclick="abrirModalSaldo()" class="btn btn-ingreso" style="grid-column: span 2;">＋ Agregar Entrada / Salida</button>
+            <button onclick="abrirModalSaldo()" class="btn btn-ingreso">＋ Agregar Entrada / Salida</button>
         </section>
 
         <section class="grid-gastos">
@@ -32,12 +32,9 @@
         <div class="modal-content">
             <h2 id="titulo-gasto-fijo">Editar</h2>
             <input type="number" id="monto-fijo" inputmode="decimal" placeholder="Monto $">
-            
             <div id="campo-fecha" class="hidden">
-                <label style="font-size: 0.8rem; color: #888;">Fecha de Vencimiento:</label>
                 <input type="date" id="fecha-vencimiento">
             </div>
-
             <div class="modal-actions-column">
                 <button id="btn-pagado" onclick="marcarComoPagado()" class="btn-pagado">MARCAR COMO PAGADO</button>
                 <div class="modal-actions">
@@ -51,8 +48,7 @@
     <div id="modal-saldo" class="modal hidden">
         <div class="modal-content">
             <h2>Ajustar Dinero</h2>
-            <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Usa (-) para restar.</p>
-            <input type="number" id="nuevo-saldo-input" inputmode="decimal" placeholder="Ej: 5000 o -500">
+            <input type="number" id="nuevo-saldo-input" inputmode="decimal" placeholder="Monto $">
             <div class="modal-actions">
                 <button type="button" onclick="cerrarModalSaldo()" class="btn-cancel">Cancelar</button>
                 <button type="button" onclick="guardarSaldoInicial()" class="btn-confirm">Aplicar</button>
