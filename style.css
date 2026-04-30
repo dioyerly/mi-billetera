@@ -134,3 +134,73 @@ body { background-color: var(--bg); color: var(--text); display: flex; justify-c
 }
 
 .modal-actions-column { display: flex; flex-direction: column; margin-top: 15px; }
+
+
+/* Estilos para el estado PAGADO */
+.card-gasto.pagado {
+    background-color: #e8f5e9; /* Un verde muy clarito */
+    border-color: #a5d6a7 !important;
+    opacity: 0.8;
+}
+
+.card-gasto.pagado .amount {
+    color: #2e7d32;
+    text-decoration: line-through; /* Tachamos el monto porque ya se pagó */
+}
+
+/* Botón MARCAR COMO PAGADO dentro del modal */
+.btn-pagado {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 10px;
+    background-color: #c8e6c9;
+    color: #2e7d32;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-pagado:hover {
+    background-color: #a5d6a7;
+}
+
+/* Estilo para la NOTA de los Extras */
+.card-gasto div[style*="font-size:0.75rem"] {
+    background: #fdf2f7;
+    border-radius: 5px;
+    padding: 2px 5px;
+    display: inline-block;
+    margin-top: 5px;
+    border: 1px dashed #ff8fab;
+}
+
+/* Ajuste para el selector de mes */
+.month-selector {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.month-selector input {
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    font-family: inherit;
+    color: #555;
+    outline: none;
+}
+
+/* Contenedor de acciones en el modal para que el botón de pagado esté arriba */
+.modal-actions-column {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ajuste de los textos de deuda anterior */
+small[style*="color:#d63384"] {
+    display: block;
+    line-height: 1.2;
+    margin-top: 4px;
+}
