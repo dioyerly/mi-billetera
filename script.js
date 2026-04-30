@@ -1,4 +1,3 @@
-// --- CONFIGURACIÓN DE FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyC_06OOZ1yMoBG9VtrLJ4_ruTqO3FRBLtI",
   authDomain: "mibilletera-611ad.firebaseapp.com",
@@ -39,9 +38,7 @@ window.onload = () => {
     document.getElementById('mes-activo').value = mesActual;
 
     db.collection("usuarios").doc("mi_unica_cuenta").onSnapshot((doc) => {
-        if (doc.exists) {
-            datosMensuales = doc.data();
-        }
+        if (doc.exists) { datosMensuales = doc.data(); }
         inicializarMes(mesActual);
         actualizarUI();
     });
@@ -57,13 +54,7 @@ function inicializarMes(mes) {
     }
 }
 
-async function guardarEnNube() {
-    try {
-        await db.collection("usuarios").doc("mi_unica_cuenta").set(datosMensuales);
-    } catch (e) {
-        console.error("Error al guardar:", e);
-    }
-}
+async function guardarEnNube() { await db.collection("usuarios").doc("mi_unica_cuenta").set(datosMensuales); }
 
 function cambiarMes() {
     mesActual = document.getElementById('mes-activo').value;
@@ -73,13 +64,11 @@ function cambiarMes() {
 
 function obtenerDeudaAtrasada(idCategoria, mesFiltro) {
     let deudaTotal = 0;
-    const mesesGuardados = Object.keys(datosMensuales).sort();
-    mesesGuardados.forEach(mes => {
+    const meses = Object.keys(datosMensuales).sort();
+    meses.forEach(mes => {
         if (mes < mesFiltro) {
             const gasto = datosMensuales[mes].gastos.find(g => g.id === idCategoria);
-            if (gasto && gasto.pagado === false && gasto.monto > 0) {
-                deudaTotal += gasto.monto;
-            }
+            if (gasto && !gasto.pagado && gasto.monto > 0) deudaTotal += gasto.monto;
         }
     });
     return deudaTotal;
@@ -88,92 +77,57 @@ function obtenerDeudaAtrasada(idCategoria, mesFiltro) {
 function actualizarUI() {
     const data = datosMensuales[mesActual];
     if (!data) return;
+    let pendiente = data.gastos.reduce((acc, g) => acc + (!g.pagado ? g.monto : 0), 0);
+    let deudaPasada = 0;
+    categoriasBase.forEach(c => deudaPasada += obtenerDeudaAtrasada(c.id, mesActual));
+    let disponible = data.ingreso - (pendiente + deudaPasada);
 
-    let totalPendienteEsteMes = data.gastos.reduce((acc, g) => acc + (!g.pagado ? g.monto : 0), 0);
-    let totalDeudaPasada = 0;
-    categoriasBase.forEach(c => {
-        totalDeudaPasada += obtenerDeudaAtrasada(c.id, mesActual);
-    });
-
-    let saldoDispo = data.ingreso - (totalPendienteEsteMes + totalDeudaPasada);
-
-    document.getElementById('saldo-total').innerText = `$${saldoDispo.toLocaleString('es-AR')}`;
-    const inicialTxt = document.getElementById('ingreso-inicial-texto');
-    if(inicialTxt) inicialTxt.innerText = `Ingreso Inicial: $${data.ingreso.toLocaleString('es-AR')}`;
-    
+    document.getElementById('saldo-total').innerText = `$${disponible.toLocaleString('es-AR')}`;
+    document.getElementById('ingreso-inicial-texto').innerText = `Ingreso Inicial: $${data.ingreso.toLocaleString('es-AR')}`;
     renderizarCards();
 }
 
 function renderizarCards() {
     const contenedor = document.getElementById('contenedor-cards');
-    if (!contenedor) return;
     contenedor.innerHTML = '';
-    
     datosMensuales[mesActual].gastos.forEach(cat => {
-        const deudaVieja = obtenerDeudaAtrasada(cat.id, mesActual);
+        const deuda = obtenerDeudaAtrasada(cat.id, mesActual);
         const div = document.createElement('div');
         div.className = `card-gasto ${cat.pagado ? 'pagado' : ''}`;
-        
-        if (deudaVieja > 0 && !cat.pagado) {
-            div.style.border = "2px solid #ff8fab";
-        } else {
-            div.style.border = "1px solid #eee";
-        }
-
+        if (deuda > 0 && !cat.pagado) div.style.border = "2px solid #ff8fab";
         div.onclick = () => abrirModalGasto(cat.id);
-        const montoMostrar = cat.monto + deudaVieja;
-        
         div.innerHTML = `
             <span class="icon">${cat.icono}</span>
             <span class="name">${cat.nombre}</span>
-            <span class="amount">$${montoMostrar.toLocaleString('es-AR')}</span>
-            ${cat.nota ? `<div style="font-size:0.75rem; color:#d63384; font-weight:bold; margin-top:2px;">"${cat.nota}"</div>` : ''}
-            <div class="date">
-                ${cat.pagado ? '✅ PAGADO' : (cat.fecha ? 'Vence: ' + cat.fecha : '')}
-                ${deudaVieja > 0 && !cat.pagado ? `<br><small style="color:#d63384; font-weight:bold;">Deuda anterior: $${deudaVieja.toLocaleString('es-AR')}</small>` : ''}
-            </div>
+            <span class="amount">$${(cat.monto + deuda).toLocaleString('es-AR')}</span>
+            ${cat.nota ? `<div style="font-size:0.7rem; color:#888;">"${cat.nota}"</div>` : ''}
+            <div class="date">${cat.pagado ? '✅ PAGADO' : (cat.fecha ? 'Vence: ' + cat.fecha : '')}</div>
         `;
         contenedor.appendChild(div);
     });
 }
 
 let catSeleccionadaId = null;
-
 function abrirModalGasto(id) {
     catSeleccionadaId = id;
     const cat = datosMensuales[mesActual].gastos.find(g => g.id === id);
-    
+    if (id === 'EXTRAS') {
+        const n = prompt("¿Qué gasto extra es?", cat.nota || "");
+        if (n !== null) { cat.nota = n; actualizarUI(); }
+    }
     document.getElementById('titulo-gasto-fijo').innerText = cat.nombre;
     document.getElementById('monto-fijo').value = cat.monto || '';
-    
-    if (id === 'EXTRAS') {
-        const notaActual = cat.nota || "";
-        const nuevaNota = prompt("¿En qué gastaste este extra?", notaActual);
-        if (nuevaNota !== null) {
-            cat.nota = nuevaNota;
-            actualizarUI();
-        }
-    }
-
-    const btnPagado = document.getElementById('btn-pagado');
-    btnPagado.innerText = cat.pagado ? "DESMARCAR PAGO" : "MARCAR COMO PAGADO";
-
-    const campoFecha = document.getElementById('campo-fecha');
-    if (cat.tieneVencimiento) {
-        campoFecha.classList.remove('hidden');
-        document.getElementById('fecha-vencimiento').value = cat.fecha || '';
-    } else {
-        campoFecha.classList.add('hidden');
-    }
+    document.getElementById('btn-pagado').innerText = cat.pagado ? "DESMARCAR PAGO" : "MARCAR COMO PAGADO";
+    const f = document.getElementById('campo-fecha');
+    if (cat.tieneVencimiento) { f.classList.remove('hidden'); document.getElementById('fecha-vencimiento').value = cat.fecha || ''; }
+    else { f.classList.add('hidden'); }
     document.getElementById('modal-gasto-especifico').classList.remove('hidden');
 }
 
 function guardarGastoFijo() {
-    const monto = parseFloat(document.getElementById('monto-fijo').value) || 0;
-    const fecha = document.getElementById('fecha-vencimiento').value;
     const cat = datosMensuales[mesActual].gastos.find(g => g.id === catSeleccionadaId);
-    cat.monto = monto;
-    cat.fecha = fecha;
+    cat.monto = parseFloat(document.getElementById('monto-fijo').value) || 0;
+    cat.fecha = document.getElementById('fecha-vencimiento').value;
     cerrarModalGasto();
     actualizarUI();
     guardarEnNube();
@@ -187,20 +141,12 @@ function marcarComoPagado() {
     guardarEnNube();
 }
 
-function abrirModalSaldo() { 
-    document.getElementById('modal-saldo').classList.remove('hidden'); 
-    document.getElementById('nuevo-saldo-input').value = ""; 
-    document.getElementById('nuevo-saldo-input').focus();
-}
-
+function abrirModalSaldo() { document.getElementById('modal-saldo').classList.remove('hidden'); }
 function guardarSaldoInicial() {
-    const input = document.getElementById('nuevo-saldo-input');
-    const valorIngresado = parseFloat(input.value) || 0;
-    datosMensuales[mesActual].ingreso += valorIngresado;
+    datosMensuales[mesActual].ingreso += parseFloat(document.getElementById('nuevo-saldo-input').value) || 0;
     cerrarModalSaldo();
     actualizarUI();
     guardarEnNube();
 }
-
 function cerrarModalGasto() { document.getElementById('modal-gasto-especifico').classList.add('hidden'); }
 function cerrarModalSaldo() { document.getElementById('modal-saldo').classList.add('hidden'); }
