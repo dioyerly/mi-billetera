@@ -1,74 +1,78 @@
-margin-bottom: 10px; 
-    cursor: pointer;
+:root {
+    --bg: #F8F9FA;
+    --card-grad: linear-gradient(135deg, #CFBAF0, #A3C4F3);
+    --pastel-green: #B9FBC0;
+    --pastel-red: #FFCFD2;
+    --pastel-purple: #D0D1FF;
+    --text: #4A4A4A;
 }
 
-/* --- NUEVOS ESTILOS --- */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
 
-.modal-actions-column { 
-    display: flex; 
-    flex-direction: column; 
-    margin-top: 15px; 
+body { background-color: var(--bg); color: var(--text); display: flex; justify-content: center; }
+
+.app-container { width: 100%; max-width: 480px; padding: 20px; }
+
+/* Tarjeta Principal */
+.balance-card {
+    background: var(--card-grad);
+    color: white;
+    padding: 25px;
+    border-radius: 25px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(163, 196, 243, 0.4);
+    margin-bottom: 25px;
+}
+.balance-card h1 { font-size: 2.8rem; margin: 5px 0; }
+.balance-card small { 
+    display: block; margin-top: 10px; font-size: 0.8rem; 
+    background: rgba(255,255,255,0.3); padding: 5px; border-radius: 10px; 
 }
 
-/* Estilos para el estado PAGADO */
-.card-gasto.pagado {
-    background-color: #e8f5e9 !important;
-    border-color: #a5d6a7 !important;
-    opacity: 0.8;
+/* Selector de Mes */
+.month-selector { margin-bottom: 15px; display: flex; justify-content: center; }
+.month-selector input { 
+    padding: 10px; border-radius: 15px; border: 1px solid #ddd; 
+    font-size: 1rem; color: #666; background: white; outline: none;
 }
 
-.card-gasto.pagado .amount {
-    color: #2e7d32;
-    text-decoration: line-through;
-}
+/* Botones */
+.controls { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 25px; }
+.btn { border: none; padding: 16px; border-radius: 18px; font-size: 1rem; font-weight: bold; cursor: pointer; color: #444; }
+.btn-ingreso { background-color: var(--pastel-green); }
 
-/* Botón MARCAR COMO PAGADO dentro del modal */
+/* Grilla de Gastos */
+.grid-gastos h3 { font-size: 0.9rem; color: #888; margin-bottom: 15px; }
+.contenedor-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 30px; }
+
+.card-gasto {
+    background: white; padding: 15px; border-radius: 20px; border: 1px solid #eee;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    cursor: pointer; transition: transform 0.1s;
+}
+.card-gasto:active { transform: scale(0.95); }
+.card-gasto .icon { font-size: 1.6rem; margin-bottom: 5px; }
+.card-gasto .name { font-size: 0.8rem; font-weight: bold; color: #777; text-transform: uppercase; }
+.card-gasto .amount { font-size: 1rem; font-weight: bold; color: #4A4A4A; margin: 4px 0; }
+.card-gasto .date { font-size: 0.65rem; color: #ff8fab; font-weight: bold; }
+
+/* Estado Pagado */
+.card-gasto.pagado { background-color: #d1f7d6; border-color: #a8e6b0; }
+.card-gasto.pagado .amount { color: #2d6a4f; text-decoration: line-through; opacity: 0.6; }
+.card-gasto.pagado .date { color: #2d6a4f; }
+
 .btn-pagado {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: none;
-    border-radius: 10px;
-    background-color: #c8e6c9;
-    color: #2e7d32;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s;
+    width: 100%; padding: 15px; border: none; border-radius: 12px;
+    background-color: #B9FBC0; color: #2d6a4f; font-weight: bold;
+    margin-bottom: 10px; cursor: pointer;
 }
 
-.btn-pagado:hover {
-    background-color: #a5d6a7;
-}
-
-/* Estilo para la NOTA de los Extras */
-.card-gasto div[style*="font-size:0.75rem"] {
-    background: #fdf2f7;
-    border-radius: 5px;
-    padding: 2px 5px;
-    display: inline-block;
-    margin-top: 5px;
-    border: 1px dashed #ff8fab;
-}
-
-/* Ajuste para el selector de mes */
-.month-selector {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-.month-selector input {
-    padding: 8px 15px;
-    border-radius: 20px;
-    border: 1px solid #ddd;
-    font-family: inherit;
-    color: #555;
-    outline: none;
-}
-
-/* Ajuste de los textos de deuda anterior */
-small[style*="color:#d63384"] {
-    display: block;
-    line-height: 1.2;
-    margin-top: 4px;
-}
+/* Modales */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 10; }
+.hidden { display: none; }
+.modal-content { background: white; padding: 25px; border-radius: 25px; width: 85%; max-width: 350px; }
+.modal-content input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #EEE; border-radius: 12px; outline: none; }
+.modal-actions { display: flex; gap: 10px; }
+.modal-actions button { flex: 1; padding: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; }
+.btn-cancel { background: #F0F0F0; }
+.btn-confirm { background: var(--pastel-purple); }
